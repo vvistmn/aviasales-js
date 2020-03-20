@@ -50,6 +50,24 @@ const selectCity = (event, input, list) => {
         list.textContent = '';
     }
 };
+const renderCheapDay = (cheapTicket) => {
+    console.log(cheapTicket);
+};
+const renderCheapYear = (cheapTickets) => {
+    console.log(cheapTickets);
+};
+const renderCheap = (data, date) => {
+    const cheapTickedYear = JSON.parse(data).best_prices;
+    console.log(cheapTickedYear);
+    const cheapTickedDay = cheapTickedYear.filter((item) => {
+        return item.depart_date === date;
+    });
+    renderCheapDay(cheapTickedDay);
+    renderCheapYear(cheapTickedYear);
+    console.log(cheapTickedDay);
+    
+    
+};
 // Выводим функцию списка городов
 inputCitiesFrom.addEventListener('input', () => {
     showCity(inputCitiesFrom, dropdownCitiesFrom)
@@ -64,9 +82,25 @@ dropdownCitiesFrom.addEventListener('click', (event) => {
 dropdownCitiesTo.addEventListener('click', (event) => {
     selectCity(event, inputCitiesTo, dropdownCitiesTo);
 });
-//Вызов функции для получении городов
+formSearch.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const cityFrom = city.find((item) => inputCitiesFrom.value === item.name),
+        cityTo = city.find((item) => inputCitiesTo.value === item.name);
+    const formData = {
+        from: cityFrom.code,
+        to: cityTo.code,
+        when: inputDateDepart.value,
+    }
+    const requestData = `?depatr_date=${formData.when}&origin=${formData.from}&destination=${formData.to}&one_way=true&token${API_KEY}`;
+    // const requestData = '?depatr_date=' + formData.when + '&origin=' + formData.from + '&destination=' + formData.to + '&one_way=true&token' + API_KEY;
+    getData(calendar + requestData, (response) => {// response - ответ от сервера
+        renderCheap(response, formData.when);
+    });
+});
+// Вызов функции для получении городов
 getData(proxy + citiesApi, (data) => {
     city = JSON.parse(data).filter((item) => {
         return item.name;
     });
+    console.log(city);
 });
